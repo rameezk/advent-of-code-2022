@@ -1,0 +1,12 @@
+# See https://pre-commit.com/ for usage and config
+repos:
+  - repo: local
+    hooks:
+      - id: Python Black
+        name: black
+        stages:
+          - commit
+        language: system
+        entry: pipenv run black
+        types:
+          - python
