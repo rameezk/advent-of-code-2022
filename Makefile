@@ -1,4 +1,4 @@
-SUBDIRS = $(shell ls -d */)
+SUBDIRS = $(shell ls -d day*/)
 
 run-all:
 	for dir in $(SUBDIRS) ; do make -C $$dir run ; done

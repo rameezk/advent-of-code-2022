@@ -1,5 +1,5 @@
 run:
-	python main.py
+	PYTHONPATH=.. python day_{{cookiecutter.aoc_day}}.py
 
 test:
-	python -m pytest tests.py
+	PYTHONPATH=.. python -m pytest tests.py
