@@ -9,8 +9,9 @@ def timeit(f: typing.Callable):
     @wraps(f)
     def wrapper(*args, **kwargs):
         t1 = time.time()
-        f()
+        result = f()
         t2 = time.time()
         print(f"Execution time = {(t2 - t1) * 10**3} ms")
+        return result
 
     return wrapper
