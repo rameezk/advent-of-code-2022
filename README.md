@@ -4,5 +4,5 @@
 
 ## Generate the puzzle for the day
 ```shell
-make generate
+aoc generate --day 1
 ```
