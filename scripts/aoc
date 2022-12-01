@@ -70,6 +70,17 @@ def _infer_day_from_path() -> int:
     return int(day)
 
 
+def _map_answer_submission_to_status(text: str) -> AnswerStatus:
+    if "you don't seem to be solving the right level" in text.lower():
+        return AnswerStatus.ALREADY_SUBMITTED
+    elif "that's not the right answer" in text.lower():
+        return AnswerStatus.INCORRECT
+    elif "that's the right answer" in text.lower():
+        return AnswerStatus.CORRECT
+    else:
+        return AnswerStatus.UNKNOWN
+
+
 def _submit_answer(answer: str, day: int, part: 1) -> (AnswerStatus, str):
     url = f"{BASE_URL}/{AOC_YEAR}/day/{day}/answer"
     response = requests.post(
@@ -84,14 +95,8 @@ def _submit_answer(answer: str, day: int, part: 1) -> (AnswerStatus, str):
         echo_error(f"Failed to parse the response from Advent of Code")
         raise typer.Exit(1)
 
-    if "you don't seem to be solving the right level" in text.lower():
-        return AnswerStatus.ALREADY_SUBMITTED, text
-    if "that's not the right answer" in text.lower():
-        return AnswerStatus.INCORRECT, text
-    if "that's the right answer" in text.lower():
-        return AnswerStatus.CORRECT, text
-    else:
-        return AnswerStatus.UNKNOWN, text
+    status = _map_answer_submission_to_status(text)
+    return status, text
 
 
 @app.command()
