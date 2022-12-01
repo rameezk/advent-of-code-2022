@@ -23,7 +23,7 @@ class AnswerStatus(StrEnum):
 
 
 def echo_info(msg: str):
-    typer.secho(msg, fg=typer.colors.MAGENTA)
+    typer.secho(f"[..] {msg}", fg=typer.colors.MAGENTA)
 
 
 def echo_error(msg: str):
@@ -43,7 +43,8 @@ def _get_session_cookie() -> str:
 
 
 def _print_data_sample(data: str):
-    echo_info("Here's a sample of data")
+    echo_info("Here's a sample of the data")
+    typer.secho(data[:100], fg=typer.colors.GREEN)
 
 
 def _get_input_data(day: int) -> str:
@@ -98,7 +99,7 @@ def download_input(
     output_filename: str = "input.txt",
 ):
     if day is None:
-        echo_info("Attempting to infer day")
+        echo_info("Inferring day from directory")
         day = _infer_day_from_path()
         echo_info(f"Day found to be {day}")
 
