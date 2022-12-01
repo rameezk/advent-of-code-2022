@@ -1,5 +1,3 @@
 run:
-	PYTHONPATH=.. python day_1.py
-
-test:
-	PYTHONPATH=.. python -m pytest tests.py
+	PYTHONPATH=.. python day_01_p1.py
+	PYTHONPATH=.. python day_01_p2.py

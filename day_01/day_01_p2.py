@@ -1,6 +1,3 @@
-from common.timing import timeit
-
-
 def compute_totals(data: str) -> list:
     totals = []
     for group in data.split("\n\n"):
@@ -9,17 +6,7 @@ def compute_totals(data: str) -> list:
     return totals
 
 
-@timeit
-def p1():
-    with open("./input.txt") as f:
-        data = f.read()
-    totals = compute_totals(data)
-    highest = max(totals)
-    return highest
-
-
-@timeit
-def p2():
+def solve_p2():
     with open("./input.txt") as f:
         data = f.read()
     totals = compute_totals(data)
@@ -28,11 +15,5 @@ def p2():
 
 
 if __name__ == "__main__":
-    print("======p1=====")
-    p1 = p1()
-    print(p1)
-    print("======p1=====")
-    print("======p2=====")
-    p2 = p2()
+    p2 = solve_p2()
     print(p2)
-    print("======p2=====")

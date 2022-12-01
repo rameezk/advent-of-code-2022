@@ -8,6 +8,7 @@ from typing import Optional
 import requests
 import typer
 from bs4 import BeautifulSoup
+from cookiecutter.main import cookiecutter
 
 BASE_URL = "https://adventofcode.com"
 AOC_YEAR = "2022"
@@ -132,6 +133,25 @@ def submit_answer(
             typer.secho(text, fg=typer.colors.BLACK, bg=typer.colors.GREEN)
         case _:
             typer.secho(text, fg=typer.colors.BLACK, bg=typer.colors.MAGENTA)
+
+
+@app.command(help="Generate the scaffolding for the day's puzzle")
+def generate(day: int = typer.Option(..., min=1, max=25)):
+    echo_info(f"Generating scaffolding for day {day}")
+    project_root = Path(__file__).parent.parent
+    directory_to_create = project_root / f"day_{day:02}"
+    template_path = project_root / "__template__"
+
+    if directory_to_create.is_dir():
+        echo_error(f"Directory {directory_to_create} already exists.")
+        raise typer.Exit(1)
+
+    cookiecutter(
+        str(template_path.resolve()),
+        extra_context={"aoc_day": f"{day:02}"},
+        no_input=True,
+        output_dir=project_root,
+    )
 
 
 if __name__ == "__main__":
