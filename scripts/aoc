@@ -1,0 +1,118 @@
+#!/usr/bin/env python
+
+from enum import StrEnum, auto
+from pathlib import Path
+
+import requests
+import typer
+from bs4 import BeautifulSoup
+
+BASE_URL = "https://adventofcode.com"
+AOC_YEAR = "2022"
+
+app = typer.Typer()
+
+
+class AnswerStatus(StrEnum):
+    ALREADY_SUBMITTED = auto()
+    CORRECT = auto()
+    INCORRECT = auto()
+    UNKNOWN = auto()
+
+
+def _get_session_cookie() -> str:
+    fpath = Path(__file__).parent.parent / ".session"
+
+    if not fpath.is_file():
+        typer.secho(f"Missing cookie information in {fpath}", fg=typer.colors.RED)
+        raise typer.Exit(1)
+
+    with open(fpath.resolve()) as f:
+        session_cookie = f.read()
+        return session_cookie
+
+
+def _print_data_sample(data: str):
+    typer.secho("Here's a sample of data", fg=typer.colors.MAGENTA)
+    typer.secho(data[:100], fg=typer.colors.GREEN)
+    typer.secho("[...]", fg=typer.colors.GREEN)
+
+
+def _get_input_data(day: int) -> str:
+    url = f"{BASE_URL}/{AOC_YEAR}/day/{day}/input"
+    response = requests.get(url, headers={"Cookie": f"session={_get_session_cookie()}"})
+
+    if response.status_code != 200:
+        typer.secho(
+            f"Could not download input. Got status code {response.status_code}.",
+            fg=typer.colors.RED,
+        )
+        raise typer.Exit(1)
+
+    return response.text
+
+
+def _save_data_to_file(data: str, fpath: str):
+    with open(fpath, "w") as f:
+        f.write(data)
+
+
+def _submit_answer(answer: str, day: int, part: 1) -> (AnswerStatus, str):
+    url = f"{BASE_URL}/{AOC_YEAR}/day/{day}/answer"
+    response = requests.post(
+        url,
+        data={"level": part, "answer": answer},
+        headers={"Cookie": f"session={_get_session_cookie()}"},
+    )
+    soup = BeautifulSoup(response.content, "html.parser")
+    text: str = soup.body.article.p.text
+
+    if not text:
+        typer.secho(
+            f"Failed to parse the response from Advent of Code", fg=typer.colors.RED
+        )
+        raise typer.Exit(1)
+
+    if "you don't seem to be solving the right level" in text.lower():
+        return AnswerStatus.ALREADY_SUBMITTED, text
+    if "that's not the right answer" in text.lower():
+        return AnswerStatus.INCORRECT, text
+    if "that's the right answer" in text.lower():
+        return AnswerStatus.CORRECT, text
+    else:
+        return AnswerStatus.UNKNOWN, text
+
+
+@app.command()
+def download_input(
+    day: int = typer.Argument(..., min=1, max=25),
+    output_filename: str = "input.txt",
+):
+    typer.secho(f"Downloading input for day {day}", fg=typer.colors.MAGENTA)
+    data = _get_input_data(day)
+    _print_data_sample(data)
+    _save_data_to_file(data, output_filename)
+    typer.secho(f"Input data saved to {output_filename}", fg=typer.colors.MAGENTA)
+
+
+@app.command()
+def submit_answer(
+    answer: str,
+    day: int = typer.Option(..., min=1, max=25),
+    part: int = typer.Option(..., min=1, max=2),
+):
+    typer.secho(f"Submitting answer for day {day} part {part}")
+    status, text = _submit_answer(answer, day, part)
+    match status:
+        case AnswerStatus.ALREADY_SUBMITTED:
+            typer.secho(text, fg=typer.colors.BLACK, bg=typer.colors.BLUE)
+        case AnswerStatus.INCORRECT:
+            typer.secho(text, fg=typer.colors.BLACK, bg=typer.colors.RED)
+        case AnswerStatus.CORRECT:
+            typer.secho(text, fg=typer.colors.BLACK, bg=typer.colors.GREEN)
+        case _:
+            typer.secho(text, fg=typer.colors.BLACK, bg=typer.colors.MAGENTA)
+
+
+if __name__ == "__main__":
+    app()
