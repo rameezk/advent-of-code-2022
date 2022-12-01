@@ -1,5 +1,6 @@
 def solve_p1():
-    ...
+    with open("./sample.txt") as file:
+        input_data = file.read()
 
 
 if __name__ == "__main__":
