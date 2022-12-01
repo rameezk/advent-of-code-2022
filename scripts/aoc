@@ -99,7 +99,7 @@ def _submit_answer(answer: str, day: int, part: 1) -> (AnswerStatus, str):
     return status, text
 
 
-@app.command()
+@app.command(help="Download the day's input")
 def download_input(
     day: Optional[int] = typer.Argument(None, min=1, max=25),
     output_filename: str = "input.txt",
@@ -116,7 +116,7 @@ def download_input(
     echo_info(f"Input data saved to {output_filename}")
 
 
-@app.command()
+@app.command(help="Submit the day's answer")
 def submit_answer(
     answer: str,
     day: Optional[int] = typer.Option(None, min=1, max=25),
