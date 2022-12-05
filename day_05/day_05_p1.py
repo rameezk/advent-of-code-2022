@@ -16,14 +16,7 @@ def parse_data(filename: str) -> (dict, list):
                     if letter != " ":
                         stacks[stack_number].insert(0, letter)
             elif "move" in line:
-                instructions.append(
-                    map(
-                        int,
-                        re.findall(
-                            r"^move\s(\d+)\sfrom\s(\d+)\sto\s(\d+)$", line.strip()
-                        ).pop(),
-                    )
-                )
+                instructions.append(map(int, re.findall(r"(\d+)", line.strip())))
             # Skip any other line
             else:
                 ...
