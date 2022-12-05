@@ -1,12 +1,16 @@
-from collections import defaultdict
+from collections import defaultdict, namedtuple
 import re
 
 import pytest
 
+Instruction = namedtuple(
+    "instruction", ["number_of_crates_to_move", "from_stack", "to_stack"]
+)
+
 
 def parse_data(filename: str) -> (dict, list):
     stacks = defaultdict(list)
-    instructions = []
+    instructions: [Instruction] = []
     with open(filename) as file:
         for line in file:
             # parse stacks
@@ -15,8 +19,10 @@ def parse_data(filename: str) -> (dict, list):
                 for stack_number, letter in enumerate(letters, start=1):
                     if letter != " ":
                         stacks[stack_number].insert(0, letter)
+            # parse instructions
             elif "move" in line:
-                instructions.append(map(int, re.findall(r"(\d+)", line.strip())))
+                instruction = Instruction(*map(int, re.findall(r"(\d+)", line.strip())))
+                instructions.append(instruction)
             # Skip any other line
             else:
                 ...
@@ -33,10 +39,10 @@ def top_crates(stacks: dict) -> str:
 
 def solve_p1(filename: str):
     stacks, instructions = parse_data(filename)
-    for number_of_crates_to_move, from_stack, to_stack in instructions:
-        for i in range(number_of_crates_to_move):
-            crate_to_move = stacks[from_stack].pop()
-            stacks[to_stack].append(crate_to_move)
+    for instruction in instructions:
+        for _ in range(instruction.number_of_crates_to_move):
+            crate_to_move = stacks[instruction.from_stack].pop()
+            stacks[instruction.to_stack].append(crate_to_move)
     return top_crates(stacks)
 
 
