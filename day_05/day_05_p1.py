@@ -4,14 +4,6 @@ import re
 import pytest
 
 
-CRATE_LENGTH = 4  # "[A] "
-
-
-def divide_crates(c):
-    for i in range(0, len(c), CRATE_LENGTH):
-        yield c[i : i + CRATE_LENGTH]
-
-
 def parse_data(filename: str) -> (dict, list):
     stacks = defaultdict(list)
     instructions = []
@@ -19,12 +11,10 @@ def parse_data(filename: str) -> (dict, list):
         for line in file:
             # parse stacks
             if "[" in line:
-                for stack_number, crate in enumerate(divide_crates(line), start=1):
-                    no_crate_for_this_stack = len(crate.strip()) == 0
-                    if not no_crate_for_this_stack:
-                        crate_id = crate.strip()[1]
-                        stacks[stack_number].insert(0, crate_id)
-                # parse instructions
+                letters = [line[i] for i in range(1, len(line), 4)]
+                for stack_number, letter in enumerate(letters, start=1):
+                    if letter != " ":
+                        stacks[stack_number].insert(0, letter)
             elif "move" in line:
                 instructions.append(
                     map(
