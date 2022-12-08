@@ -9,19 +9,21 @@ def get_top_path_heights(height_map: dict, coord: tuple[int, int]) -> list[int]:
     return heights
 
 
-def get_bottom_path_heights(height_map: dict, coord: tuple[int, int]) -> list[int]:
+def get_bottom_path_heights(
+    height_map: dict, coord: tuple[int, int], max_y: int
+) -> list[int]:
     x, y = coord
     heights = []
-    _, max_y = get_max_coords(height_map)
     for y_d in range(y + 1, max_y + 1):
         heights.append(height_map[(x, y_d)])
     return heights
 
 
-def get_right_path_heights(height_map: dict, coord: tuple[int, int]) -> list[int]:
+def get_right_path_heights(
+    height_map: dict, coord: tuple[int, int], max_x: int
+) -> list[int]:
     x, y = coord
     heights = []
-    max_x, _ = get_max_coords(height_map)
     for x_d in range(x + 1, max_x + 1):
         heights.append(height_map[(x_d, y)])
     return heights
@@ -47,14 +49,8 @@ def is_tallest_tree_in_path(tree_height: int, path_heights: list[int]) -> bool:
     return True
 
 
-def get_max_coords(height_map: dict) -> tuple[int, int]:
-    max_x, max_y = max([k for k in height_map.keys()])
-    return max_x, max_y
-
-
-def is_edge(height_map: dict, coord: tuple[int, int]) -> bool:
+def is_edge(coord: tuple[int, int], max_x: int, max_y: int) -> bool:
     x, y = coord
-    max_x, max_y = get_max_coords(height_map)
     return x == 0 or y == 0 or x == max_x or y == max_y
 
 
@@ -66,9 +62,10 @@ def solve_p1():
             for x, c in enumerate(line.strip()):
                 height_map[x, y] = int(c)
 
+    max_x, max_y = max([k for k in height_map.keys()])
     visible_count = 0
     for coord, height in height_map.items():
-        if is_edge(height_map, coord):
+        if is_edge(coord, max_x, max_y):
             visible_count += 1
             continue
 
@@ -78,13 +75,13 @@ def solve_p1():
                     height, get_top_path_heights(height_map, coord)
                 ),
                 is_tallest_tree_in_path(
-                    height, get_bottom_path_heights(height_map, coord)
+                    height, get_bottom_path_heights(height_map, coord, max_y)
                 ),
                 is_tallest_tree_in_path(
                     height, get_left_path_heights(height_map, coord)
                 ),
                 is_tallest_tree_in_path(
-                    height, get_right_path_heights(height_map, coord)
+                    height, get_right_path_heights(height_map, coord, max_x)
                 ),
             ]
         ):
@@ -96,4 +93,5 @@ def solve_p1():
 
 if __name__ == "__main__":
     p1 = solve_p1()
+    assert p1 == 1859
     print(p1)

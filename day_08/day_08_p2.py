@@ -10,19 +10,21 @@ def get_top_path_heights(height_map: dict, coord: tuple[int, int]) -> list[int]:
     return heights
 
 
-def get_bottom_path_heights(height_map: dict, coord: tuple[int, int]) -> list[int]:
+def get_bottom_path_heights(
+    height_map: dict, coord: tuple[int, int], max_y: int
+) -> list[int]:
     x, y = coord
     heights = []
-    _, max_y = get_max_coords(height_map)
     for y_d in range(y + 1, max_y + 1):
         heights.append(height_map[(x, y_d)])
     return heights
 
 
-def get_right_path_heights(height_map: dict, coord: tuple[int, int]) -> list[int]:
+def get_right_path_heights(
+    height_map: dict, coord: tuple[int, int], max_x: int
+) -> list[int]:
     x, y = coord
     heights = []
-    max_x, _ = get_max_coords(height_map)
     for x_d in range(x + 1, max_x + 1):
         heights.append(height_map[(x_d, y)])
     return heights
@@ -48,14 +50,8 @@ def compute_scenic_score(tree_height: int, path_heights: list[int]) -> int:
     return score
 
 
-def get_max_coords(height_map: dict) -> tuple[int, int]:
-    max_x, max_y = max([k for k in height_map.keys()])
-    return max_x, max_y
-
-
-def is_edge(height_map: dict, coord: tuple[int, int]) -> bool:
+def is_edge(coord: tuple[int, int], max_x: int, max_y: int) -> bool:
     x, y = coord
-    max_x, max_y = get_max_coords(height_map)
     return x == 0 or y == 0 or x == max_x or y == max_y
 
 
@@ -67,9 +63,10 @@ def solve_p2():
             for x, c in enumerate(line.strip()):
                 height_map[x, y] = int(c)
 
+    max_x, max_y = max([k for k in height_map.keys()])
     scenic_scores = []
     for coord, height in height_map.items():
-        if is_edge(height_map, coord):
+        if is_edge(coord, max_x, max_y):
             continue
 
         top_scenic_score = compute_scenic_score(
@@ -81,11 +78,11 @@ def solve_p2():
         )
 
         right_scenic_score = compute_scenic_score(
-            height, get_right_path_heights(height_map, coord)
+            height, get_right_path_heights(height_map, coord, max_x)
         )
 
         bottom_scenic_score = compute_scenic_score(
-            height, get_bottom_path_heights(height_map, coord)
+            height, get_bottom_path_heights(height_map, coord, max_y)
         )
 
         scenic_score = prod(
@@ -96,9 +93,6 @@ def solve_p2():
                 right_scenic_score,
             ]
         )
-        print(
-            f"{coord=} {height=} {(top_scenic_score, left_scenic_score, right_scenic_score, bottom_scenic_score)} {scenic_score=}"
-        )
         scenic_scores.append(scenic_score)
 
     return max(scenic_scores)
@@ -106,4 +100,5 @@ def solve_p2():
 
 if __name__ == "__main__":
     p2 = solve_p2()
+    assert p2 == 332640
     print(p2)
