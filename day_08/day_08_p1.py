@@ -83,7 +83,6 @@ def solve_p1():
             ]
         ):
             visible_count += 1
-            continue
 
     return visible_count
 

@@ -1,5 +1,4 @@
 from common.timing import timeit
-from math import prod
 import typing
 
 
