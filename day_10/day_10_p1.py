@@ -40,7 +40,7 @@ def compute_signal_strength(program: list[list[str, int | None]]) -> int:
 @timeit
 def solve_p1():
     program = parse_program("./input.txt")
-    signal_strength = compute_signal_strength(program, 3)
+    signal_strength = compute_signal_strength(program)
     return signal_strength
 
 
