@@ -34,11 +34,12 @@ def render_screen(pixels: list[int]) -> None:
         position = i % 40
 
         end_of_line = position == 39
+        sprite_width_bounds = [pixel - 1, pixel, pixel + 1]
 
-        if position in [pixel - 1, pixel, pixel + 1]:
+        if position in sprite_width_bounds:
             print("█", end="")
         else:
-            print(".", end="")
+            print(" ", end="")
 
         if end_of_line:
             print()
