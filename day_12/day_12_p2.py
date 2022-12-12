@@ -15,10 +15,6 @@ class Node:
     distance: int | None = None
     previous_node: Node | None = None
 
-    def reset(self):
-        self.distance = None
-        self.previous_node = None
-
 
 Heightmap = list[list[Node]]
 
@@ -62,25 +58,17 @@ def neighbours(
         yield heightmap[y][x]
 
 
-def reset(heightmap: Heightmap, max_x: int, max_y: int) -> Heightmap:
-    for y in range(max_y):
-        for x in range(max_x):
-            node = heightmap[y][x]
-            node.reset()
-    return heightmap
-
-
 @timeit
 def solve_p2():
-    heightmap, sources, destination = parse("./input.txt")
+    initial_heightmap, sources, destination = parse("./input.txt")
 
-    max_x = len(heightmap[0])
-    max_y = len(heightmap)
+    max_x = len(initial_heightmap[0])
+    max_y = len(initial_heightmap)
 
-    distances = []
+    min_distance = None
 
     for source in sources:
-        heightmap = reset(heightmap, max_x, max_y)
+        heightmap = initial_heightmap.copy()
         source.distance = 0
 
         queue = deque()
@@ -94,7 +82,15 @@ def solve_p2():
                 while node is not None:
                     path.append(node)
                     node = node.previous_node
-                distances.append(len(path) - 1)
+
+                distance = len(path) - 1
+
+                if min_distance is None:
+                    min_distance = distance
+
+                if min_distance is not None and distance < min_distance:
+                    min_distance = distance
+
                 break
 
             for neighbour in neighbours(heightmap, node, max_x, max_y):
@@ -107,7 +103,7 @@ def solve_p2():
                     neighbour.previous_node = node
                     queue.append(neighbour)
 
-    return min(distances)
+    return min_distance
 
 
 if __name__ == "__main__":
