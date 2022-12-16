@@ -56,7 +56,7 @@ def simulate(
             simulate(
                 minute + 1,
                 valve,
-                sum([total_pressure, pressure]),
+                total_pressure + pressure,
                 valves_open,
                 flow_rates,
                 valves_to,
@@ -69,7 +69,7 @@ def simulate(
                 simulate(
                     minute + 1,
                     to_valve if to_valve is not None else valve,
-                    sum([total_pressure, pressure]),
+                    total_pressure + pressure,
                     valves_open,
                     flow_rates,
                     valves_to,
