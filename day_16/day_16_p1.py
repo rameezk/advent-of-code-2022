@@ -27,7 +27,7 @@ def calculate_pressure(valves_open: dict, flow_rates: dict):
 def simulate(
     minute,
     valve: str,
-    pressures: list[int],
+    total_pressure: int,
     valves_open: dict,
     flow_rates: dict,
     valves_to: dict,
@@ -35,12 +35,12 @@ def simulate(
 ):
     global most_pressure
 
-    if visited.get((minute, valve), -1) >= sum(pressures):
+    if visited.get((minute, valve), -1) >= total_pressure:
         return
-    visited[minute, valve] = sum(pressures)
+    visited[minute, valve] = total_pressure
 
     if minute == 30:
-        most_pressure = max(most_pressure, sum(pressures))
+        most_pressure = max(most_pressure, total_pressure)
         return
 
     # check every 2 min
@@ -56,7 +56,7 @@ def simulate(
             simulate(
                 minute + 1,
                 valve,
-                pressures + [pressure],
+                sum([total_pressure, pressure]),
                 valves_open,
                 flow_rates,
                 valves_to,
@@ -69,7 +69,7 @@ def simulate(
                 simulate(
                     minute + 1,
                     to_valve if to_valve is not None else valve,
-                    pressures + [pressure],
+                    sum([total_pressure, pressure]),
                     valves_open,
                     flow_rates,
                     valves_to,
@@ -84,7 +84,7 @@ most_pressure = 0
 @timeit
 def solve_p1():
     flow_rates, valves_to, valves_open = parse_data("./input.txt")
-    simulate(1, "AA", [0], valves_open, flow_rates, valves_to, {})
+    simulate(1, "AA", 0, valves_open, flow_rates, valves_to, {})
     return most_pressure
 
 
